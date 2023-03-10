@@ -83,6 +83,10 @@ int main(int argc,  char** argv){
 		if(mpz_polytest(s, sum, temp, s2, s8)){
 			gmp_printf("%Zd n:%Zd k:%Zd\n", sum, s, i);
 		}
+		/*if(mpz_cmp(i, lim) > 0){
+			gmp_printf("reached %Zd\n", sum);
+			break;
+		}*/
 		if(mpz_cmp(i, lim) > 0){
 			mpz_add_ui(s, s, 1);
 			mpz_mul(s2, s, s);
