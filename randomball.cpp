@@ -1,8 +1,12 @@
+#include <unistd.h>
 #include <cstdio>
 #include <iostream>
 #include <gmp.h>
+#include <sys/syscall.h>
+#include <linux/random.h>
 
 bool mpz_polytest(mpz_t& s, mpz_t& A, mpz_t& maybe, mpz_t& s2, mpz_t& s8){
+
 	//s*s - 8*s + 16 + (8*s - 16)*A, must be a square
 
 	mpz_mul(maybe, A, s8);
@@ -33,13 +37,37 @@ bool mpz_polytest(mpz_t& s, mpz_t& A, mpz_t& maybe, mpz_t& s2, mpz_t& s8){
 
 
 int main(int argc,  char** argv){
+
+	setbuf(stdout, NULL);
+	mpz_t rand;
+	mpz_init(rand);
+	unsigned long int seed;
+	syscall(SYS_getrandom, &seed, sizeof(unsigned long int), 1);
+	//printf("seed %d\n", (int)seed);
+	mpz_set_ui(rand, seed);
+	gmp_randstate_t state;
+	gmp_randinit_default(state);
+	gmp_randseed(state, rand);
+	/*mpz_urandomb(rand, state, 22);
+	gmp_printf("rand %Zd\n", rand);
+	mpz_urandomb(rand, state, 22);
+	gmp_printf("rand %Zd\n", rand);
+	mpz_urandomb(rand, state, 22);
+	gmp_printf("rand %Zd\n", rand);
+	mpz_urandomb(rand, state, 22);
+	gmp_printf("rand %Zd\n", rand);*/
+
+	unsigned long int rsize = atoi(argv[1]);
+
 	mpz_t s;
 	mpz_t sum;
 	mpz_t i;
 	mpz_init(s);
 	mpz_init(i);
 	mpz_init(sum);
-	mpz_set_si(s, atoi(argv[1]));
+	mpz_set_si(s, 5);
+	//mpz_urandomb(rand, state, rsize);
+	//mpz_set(s, rand);
 	mpz_set_si(sum, 1);
 	mpz_set_si(i, 1);
 	
@@ -89,7 +117,12 @@ int main(int argc,  char** argv){
 			break;
 		}*/
 		if(mpz_cmp(i, lim) > 0){
-			mpz_add_ui(s, s, 1);
+			do{
+				mpz_urandomb(rand, state, rsize);
+				mpz_set(s, rand);
+			}while(mpz_cmp_ui(s, 3) < 0);
+			//gmp_printf("rand %Zd\n", s);
+			//mpz_add_ui(s, s, 1);
 			mpz_mul(s2, s, s);
 			mpz_submul_ui(s2, s, 8);
 			mpz_add_ui(s2, s2, 16);

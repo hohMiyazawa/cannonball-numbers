@@ -5,8 +5,9 @@ int main(int argc, char** argv){
 	unsigned long s,i,lim,tri;
 	s = atoi(argv[1])-3;
 	lim = atoi(argv[2]);
-	mpz_t sum,acc;
-	mpz_inits(sum,acc,NULL);
+	unsigned __int128 sum;
+	mpz_t acc,temp;
+	mpz_inits(acc,temp,NULL);
 	i = lim;
 	for(;;){
 		if(i == lim){
@@ -14,16 +15,16 @@ int main(int argc, char** argv){
 			tri = i = 1;
 			mpz_set_ui(acc, (s+2) * (s+2));
 		}
-		mpz_set_ui(sum, ++i + s*tri);
+		sum = (++i + s*tri) * (unsigned __int128)(s*8);
 		tri += i;
-		mpz_addmul_ui(acc, sum, s*8);
+		mpz_add_ui(acc, acc, sum);
 		if(mpz_perfect_square_p(acc)){
-			mpz_sqrt(sum, acc);
-			mpz_add_ui(sum, sum, s-2);
-			if(mpz_divisible_ui_p(sum, s*2)){
+			mpz_sqrt(temp, acc);
+			mpz_add_ui(temp, temp, s-2);
+			if(mpz_divisible_ui_p(temp, s*2)){
 				gmp_printf("n:%d k:%d\n", s+2, i);
 			}
 		}
 	}
-	mpz_clears(sum,acc,NULL);
+	mpz_clears(acc,temp,NULL);
 }
